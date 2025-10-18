@@ -31,20 +31,21 @@ app.use(async (ctx, next) => {
 });
 
 class Bijuterie {
-  constructor({ id, cod, categorie, pret,pietre}) {
+  constructor({ id, cod, categorie, pret,pietre,data}) {
     this.id = id;
     this.cod =cod;
     this.categorie = categorie;
     this.pret = pret;
-    this.pietre=pietre;
-    this.data=new Date();
+    this.data = data || new Date();
   }
 }
 
 const bijuterii = [];
-bijuterii.push(new Bijuterie(0,'I45','inel',125,true));
+for (let i = 0; i < 3; i++) {
+  bijuterii.push(new Bijuterie({ id: `${i}`, cod: `I${i}`, categorie:'inel',pret: i*40,pietre: true , data: new Date()}));
+}
 let lastId = bijuterii[bijuterii.length - 1].id;
-const pageSize = 5;
+const pageSize = 10;
 
 const broadcast = data =>
   wss.clients.forEach(client => {
@@ -90,13 +91,9 @@ const createItem = async (ctx) => {
     ctx.response.status = 400;
     return;
   }
-  if (!item.pietre) {
-    ctx.response.body = { message: 'Stone is missing' };
-    ctx.response.status = 400;
-    return;
-  }
   item.id = `${parseInt(lastId) + 1}`;
   lastId = item.id;
+  item.data = new Date();
   bijuterii.push(item);
   ctx.response.body = item;
   ctx.response.status = 201;
@@ -126,6 +123,7 @@ router.put('/item/:id', async (ctx) => {
     ctx.response.status = 400;
     return;
   }
+  item.data = new Date();
   bijuterii[index] = item;
   ctx.response.body = item;
   ctx.response.status = 200;
