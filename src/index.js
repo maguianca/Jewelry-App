@@ -31,20 +31,20 @@ app.use(async (ctx, next) => {
 });
 
 class Bijuterie {
-  constructor({ id, cod, categorie, pret, gramaj, descriere }) {
+  constructor({ id, cod, categorie, pret,pietre}) {
     this.id = id;
     this.cod =cod;
     this.categorie = categorie;
     this.pret = pret;
-    this.gramaj=gramaj;
-    this.descriere = descriere;
+    this.pietre=pietre;
+    this.data=new Date();
   }
 }
 
 const bijuterii = [];
-bijuterii.push(new Bijuterie(0,'I45','inel',125,3.4,'inel cu amestist'));
+bijuterii.push(new Bijuterie(0,'I45','inel',125,true));
 let lastId = bijuterii[bijuterii.length - 1].id;
-const pageSize = 10;
+const pageSize = 5;
 
 const broadcast = data =>
   wss.clients.forEach(client => {
@@ -65,45 +65,41 @@ router.get('/item/:id', async (ctx) => {
   const item = bijuterii.find(item => itemId === item.id);
   if (item) {
     ctx.response.body = item;
-    ctx.response.status = 200; // ok
+    ctx.response.status = 200;
   } else {
     ctx.response.body = { message: `item with id ${itemId} not found` };
-    ctx.response.status = 404; // NOT FOUND (if you know the resource was deleted, then return 410 GONE)
+    ctx.response.status = 404;
   }
 });
 
 const createItem = async (ctx) => {
   const item = ctx.request.body;
-  if (!item.cod) { // validation
+  //validation
+  if (!item.cod) {
     ctx.response.body = { message: 'Code is missing' };
-    ctx.response.status = 400; //  BAD REQUEST
+    ctx.response.status = 400;
     return;
   }
-  if (!item.categorie) { // validation
+  if (!item.categorie) {
     ctx.response.body = { message: 'Category is missing' };
-    ctx.response.status = 400; //  BAD REQUEST
+    ctx.response.status = 400;
     return;
   }
-  if (!item.pret) { // validation
+  if (!item.pret) {
     ctx.response.body = { message: 'Price is missing' };
-    ctx.response.status = 400; //  BAD REQUEST
+    ctx.response.status = 400;
     return;
   }
-  if (!item.gramaj) { // validation
-    ctx.response.body = { message: 'Weight is missing' };
-    ctx.response.status = 400; //  BAD REQUEST
-    return;
-  }
-  if (!item.descriere) { // validation
-    ctx.response.body = { message: 'Description is missing' };
-    ctx.response.status = 400; //  BAD REQUEST
+  if (!item.pietre) {
+    ctx.response.body = { message: 'Stone is missing' };
+    ctx.response.status = 400;
     return;
   }
   item.id = `${parseInt(lastId) + 1}`;
   lastId = item.id;
   bijuterii.push(item);
   ctx.response.body = item;
-  ctx.response.status = 201; // CREATED
+  ctx.response.status = 201;
   broadcast({ event: 'created', payload: { item } });
 };
 
@@ -117,7 +113,7 @@ router.put('/item/:id', async (ctx) => {
   const itemId = item.id;
   if (itemId && id !== item.id) {
     ctx.response.body = { message: `Param id and body id should be the same` };
-    ctx.response.status = 400; // BAD REQUEST
+    ctx.response.status = 400;
     return;
   }
   if (!itemId) {
@@ -127,12 +123,12 @@ router.put('/item/:id', async (ctx) => {
   const index = bijuterii.findIndex(item => item.id === id);
   if (index === -1) {
     ctx.response.body = { message: `item with id ${id} not found` };
-    ctx.response.status = 400; // BAD REQUEST
+    ctx.response.status = 400;
     return;
   }
   bijuterii[index] = item;
   ctx.response.body = item;
-  ctx.response.status = 200; // OK
+  ctx.response.status = 200;
   broadcast({ event: 'updated', payload: { item } });
 });
 
@@ -144,17 +140,8 @@ router.del('/item/:id', ctx => {
     bijuterii.splice(index, 1);
     broadcast({ event: 'deleted', payload: { item } });
   }
-  ctx.response.status = 204; // no content
+  ctx.response.status = 204;
 });
-
-//setInterval(() => {
-//  lastUpdated = new Date();
-//  lastId = `${parseInt(lastId) + 1}`;
-//  const item = new Item({ id: lastId, text: `item ${lastId}`, date: lastUpdated, version: 1 });
-//  items.push(item);
-//  console.log(`New item: ${item.text}`);
-//  broadcast({ event: 'created', payload: { item } });
-//}, 5000);
 
 app.use(router.routes());
 app.use(router.allowedMethods());
