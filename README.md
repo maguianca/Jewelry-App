@@ -1,1 +1,2 @@
-# Jewelry-Inventor
+# Jewelry-App
+## Mobile Devices Programmimg Laboratory
