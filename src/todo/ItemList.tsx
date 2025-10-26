@@ -25,7 +25,7 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
       <IonPage>
         <IonHeader>
           <IonToolbar>
-            <IonTitle>Jewelry Inventor</IonTitle>
+            <IonTitle>Jewelry Store</IonTitle>
           </IonToolbar>
         </IonHeader>
         <IonContent>
