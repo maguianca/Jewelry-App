@@ -1,147 +1,38 @@
-const Koa = require('koa');
+import http from "http";
+import Koa from "koa";
+import WebSocket from "ws";
+import Router from "koa-router";
+import bodyParser from "koa-bodyparser";
+import jwt from "koa-jwt";
+import cors from "@koa/cors";
+import { jwtConfig, timingLogger, exceptionHandler } from "./utils.js";
+import { initWss } from "./wss.js";
+import { itemRouter } from "./item.js";
+import { authRouter } from "./auth.js";
+
 const app = new Koa();
-const server = require('http').createServer(app.callback());
-const WebSocket = require('ws');
+const server = http.createServer(app.callback());
 const wss = new WebSocket.Server({ server });
-const Router = require('koa-router');
-const cors = require('koa-cors');
-const bodyparser = require('koa-bodyparser');
+initWss(wss);
 
-app.use(bodyparser());
 app.use(cors());
-app.use(async (ctx, next) => {
-  const start = new Date();
-  await next();
-  const ms = new Date() - start;
-  console.log(`${ctx.method} ${ctx.url} ${ctx.response.status} - ${ms}ms`);
-});
+app.use(timingLogger);
+app.use(exceptionHandler);
+app.use(bodyParser());
 
-app.use(async (ctx, next) => {
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  await next();
-});
+const prefix = "/api";
 
-app.use(async (ctx, next) => {
-  try {
-    await next();
-  } catch (err) {
-    ctx.response.body = { message: err.message || 'Unexpected error' };
-    ctx.response.status = 500;
-  }
-});
+// public
+const publicApiRouter = new Router({ prefix });
+publicApiRouter.use("/auth", authRouter.routes());
+app.use(publicApiRouter.routes()).use(publicApiRouter.allowedMethods());
 
-class Bijuterie {
-  constructor({ id, cod, categorie, pret,pietre,data}) {
-    this.id = id;
-    this.cod =cod;
-    this.categorie = categorie;
-    this.pret = pret;
-    this.data = data || new Date();
-  }
-}
+app.use(jwt(jwtConfig));
 
-const bijuterii = [];
-for (let i = 0; i < 3; i++) {
-  bijuterii.push(new Bijuterie({ id: `${i}`, cod: `I${i}`, categorie:'inel',pret: i*40,pietre: true , data: new Date()}));
-}
-let lastId = bijuterii[bijuterii.length - 1].id;
-const pageSize = 10;
-
-const broadcast = data =>
-  wss.clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify(data));
-    }
-  });
-
-const router = new Router();
-
-router.get('/item', ctx => {
-  ctx.response.body = bijuterii;
-  ctx.response.status = 200;
-});
-
-router.get('/item/:id', async (ctx) => {
-  const itemId = ctx.request.params.id;
-  const item = bijuterii.find(item => itemId === item.id);
-  if (item) {
-    ctx.response.body = item;
-    ctx.response.status = 200;
-  } else {
-    ctx.response.body = { message: `item with id ${itemId} not found` };
-    ctx.response.status = 404;
-  }
-});
-
-const createItem = async (ctx) => {
-  const item = ctx.request.body;
-  //validation
-  if (!item.cod) {
-    ctx.response.body = { message: 'Code is missing' };
-    ctx.response.status = 400;
-    return;
-  }
-  if (!item.categorie) {
-    ctx.response.body = { message: 'Category is missing' };
-    ctx.response.status = 400;
-    return;
-  }
-  if (!item.pret) {
-    ctx.response.body = { message: 'Price is missing' };
-    ctx.response.status = 400;
-    return;
-  }
-  item.id = `${parseInt(lastId) + 1}`;
-  lastId = item.id;
-  item.data = new Date();
-  bijuterii.push(item);
-  ctx.response.body = item;
-  ctx.response.status = 201;
-  broadcast({ event: 'created', payload: { item } });
-};
-
-router.post('/item', async (ctx) => {
-  await createItem(ctx);
-});
-
-router.put('/item/:id', async (ctx) => {
-  const id = ctx.params.id;
-  const item = ctx.request.body;
-  const itemId = item.id;
-  if (itemId && id !== item.id) {
-    ctx.response.body = { message: `Param id and body id should be the same` };
-    ctx.response.status = 400;
-    return;
-  }
-  if (!itemId) {
-    await createItem(ctx);
-    return;
-  }
-  const index = bijuterii.findIndex(item => item.id === id);
-  if (index === -1) {
-    ctx.response.body = { message: `item with id ${id} not found` };
-    ctx.response.status = 400;
-    return;
-  }
-  item.data = new Date();
-  bijuterii[index] = item;
-  ctx.response.body = item;
-  ctx.response.status = 200;
-  broadcast({ event: 'updated', payload: { item } });
-});
-
-router.del('/item/:id', ctx => {
-  const id = ctx.params.id;
-  const index = bijuterii.findIndex(item => id === item.id);
-  if (index !== -1) {
-    const item = bijuterii[index];
-    bijuterii.splice(index, 1);
-    broadcast({ event: 'deleted', payload: { item } });
-  }
-  ctx.response.status = 204;
-});
-
-app.use(router.routes());
-app.use(router.allowedMethods());
+// protected
+const protectedApiRouter = new Router({ prefix });
+protectedApiRouter.use("/game", itemRouter.routes());
+app.use(protectedApiRouter.routes()).use(protectedApiRouter.allowedMethods());
 
 server.listen(3000);
+console.log("started on port 3000");
