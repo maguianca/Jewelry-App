@@ -19,7 +19,7 @@ export class ItemStore {
     if (!item.cod) {
       throw new Error('Missing code property')
     }
-    if (!item.category) {
+    if (!item.categorie) {
       throw new Error('Missing category property')
     }
     if (!item.pret) {
@@ -49,7 +49,7 @@ itemRouter.get('/', async (ctx) => {
 
 itemRouter.get('/:id', async (ctx) => {
   const userId = ctx.state.user._id;
-  const item = await noteStore.findOne({ _id: ctx.params.id });
+  const item = await itemStore.findOne({ _id: ctx.params.id });
   const response = ctx.response;
   if (item) {
     if (item.userId === userId) {
