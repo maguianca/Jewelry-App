@@ -22,9 +22,6 @@ export class ItemStore {
     if (!item.categorie) {
       throw new Error('Missing category property')
     }
-    if (!item.pret) {
-      throw new Error('Missing price property')
-    }
     return this.store.insert(item);
   };
 
