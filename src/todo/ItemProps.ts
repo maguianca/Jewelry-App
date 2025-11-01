@@ -1,8 +1,9 @@
 export interface ItemProps {
-  id?: string;
+  _id?: string;
   cod: string;
   categorie: string;
   pret: number;
   pietre: boolean;
   data: Date;
+  isNotSaved?:boolean;
 }

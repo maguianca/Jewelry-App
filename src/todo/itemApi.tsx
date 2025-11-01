@@ -13,12 +13,15 @@ export const createItem: (token: string, item: ItemProps) => Promise<ItemProps[]
 }
 
 export const updateItem: (token: string, item: ItemProps) => Promise<ItemProps[]> = (token, item) => {
-  return withLogs(axios.put(`${itemUrl}/${item.id}`, item, authConfig(token)), 'updateItem');
+  return withLogs(axios.put(`${itemUrl}/${item._id}`, item, authConfig(token)), 'updateItem');
 }
 
 interface MessageData {
-  type: string;
-  payload: ItemProps;
+  event: string;
+  payload: {
+    successMessage: string,
+    items: ItemProps
+  };
 }
 
 const log = getLogger('ws');

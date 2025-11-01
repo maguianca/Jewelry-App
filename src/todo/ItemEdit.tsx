@@ -24,7 +24,7 @@ interface ItemEditProps extends RouteComponentProps<{
 }> {}
 
 const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
-  const { items, saving, savingError, saveItem } = useContext(ItemContext);
+  const { items, updating, updateError, updateItem } = useContext(ItemContext);
   const [cod, setCod] = useState('');
   const [categorie, setCategorie] = useState('');
   const [pret, setPret] = useState(0);
@@ -34,7 +34,7 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
   useEffect(() => {
     log('useEffect');
     const routeId = match.params.id || '';
-    const item = items?.find(it => it.id?.toString() === routeId);
+    const item = items?.find(it => it._id?.toString() === routeId);
     setItem(item);
     if (item) {
       setCod(item.cod);
@@ -45,10 +45,10 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
     }
   }, [match.params.id, items]);
 
-  const handleSave = useCallback(() => {
+  const handleUpdate = useCallback(() => {
     const editedItem = item ? { ...item, cod, categorie, pret,pietre,data} : { cod,categorie,pret,pietre,data};
-    saveItem && saveItem(editedItem).then(() => history.goBack());
-  }, [item, saveItem, cod,categorie,pret,pietre, history]);
+    updateItem && updateItem(editedItem).then(() => history.goBack());
+  }, [item, updateItem, cod,categorie,pret,pietre, history]);
 
   const handleCancel = useCallback(() => {
     history.goBack();
@@ -68,9 +68,9 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
           <IonInput placeholder='categorie' value={categorie} onIonChange={e => setCategorie(e.detail.value|| '')} />
           <IonInput placeholder='pret' value={pret} onIonChange={e => setPret(Number(e.detail.value)|| 0)} />
           <IonCheckbox checked={pietre} onIonChange={e => setPietre(e.detail.checked)}>Pietre</IonCheckbox>
-          <IonLoading isOpen={saving} />
-          {savingError && (
-              <div>{savingError.message || 'Failed to save item'}</div>
+          <IonLoading isOpen={updating} />
+          {updateError && (
+              <div>{updateError.message || 'Failed to save item'}</div>
           )}
           <IonToolbar>
             <IonButtons slot="start">
@@ -79,8 +79,8 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
               </IonButton>
             </IonButtons>
             <IonButtons slot="end">
-              <IonButton onClick={handleSave}>
-                Save
+              <IonButton onClick={handleUpdate}>
+                Update
               </IonButton>
             </IonButtons>
           </IonToolbar>

@@ -21,7 +21,7 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
-import { ItemEdit, ItemList } from './todo';
+import { ItemEdit, ItemList, ItemAdd } from './todo';
 import { ItemProvider } from './todo/ItemProvider';
 import { AuthProvider, Login, PrivateRoute } from './auth';
 
@@ -35,7 +35,7 @@ const App: React.FC = () => (
                     <Route path="/login" component={Login} exact={true}/>
                     <ItemProvider>
                         <PrivateRoute path="/items" component={ItemList} exact={true}/>
-                        <PrivateRoute path="/item" component={ItemEdit} exact={true}/>
+                        <PrivateRoute path="/item" component={ItemAdd} exact={true}/>
                         <PrivateRoute path="/item/:id" component={ItemEdit} exact={true}/>
                     </ItemProvider>
                     <Route exact path="/" render={() => <Redirect to="/items"/>}/>
