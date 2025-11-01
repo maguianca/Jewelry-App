@@ -49,7 +49,6 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
   }, [match.params.id, items]);
 
   const handleUpdate = useCallback(() => {
-    // ✅ conversie sigură la salvare
     const normalized = (pretStr ?? '').replace(',', '.').trim();
     const pretNumber = normalized === '' ? undefined : parseFloat(normalized);
 
