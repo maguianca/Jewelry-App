@@ -143,6 +143,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
     try {
       log('saveItem start')
       dispatch({ type: CREATE_ITEM_STARTED });
+      log('pret try normal:', item.pret);
       const savedItem = await (item._id ? updateItem(token, item) : createItem(token, item));
       dispatch({ type: CREATE_ITEM_SUCCEEDED, payload: { item: savedItem } });
       log('saveItem successfully')
@@ -156,11 +157,12 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
         const { keys } = await Preferences.keys();
         const numberOfItems = keys.filter(key => key.startsWith('sav-')).length + 1;
         item._id = numberOfItems.toString();
+        log('pret before Number:', item.pret);
         await Preferences.set({ key: `sav-${item._id}`, value: JSON.stringify({ token, item }) });
         dispatch({ type: CREATE_ITEM_SUCCEEDED, payload: { item:item } });
         toast("You are offline... Saving item locally!", 3000);
       } else {
-        dispatch({ type: CREATE_ITEM_FAILED, payload: { error:new Error('Network Error') } });
+        dispatch({ type: CREATE_ITEM_FAILED, payload: { error:new Error(error.response) } });
       }
     }
   }
@@ -181,7 +183,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
         dispatch({ type: UPDATE_ITEM_SUCCEEDED, payload: { item: item } });
         toast("You are offline... Updating item locally!", 3000);
       } else {
-        dispatch({ type: UPDATE_ITEM_FAILED, payload: { error: new Error('Network Error') } });
+        dispatch({ type: UPDATE_ITEM_FAILED, payload: { error: new Error(error.response) } });
       }
     }
   }
@@ -193,7 +195,6 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
         log('executing pending operations')
         const { keys } = await Preferences.keys();
         for(const key of keys) {
-          toast("You are online again... Saving items!", 3000);
           if(key.startsWith("sav-")){
             const res = await Preferences.get({key: key});
             console.log("Result", res);
@@ -205,6 +206,8 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
               await Preferences.remove({key: key});
             }
           }
+        }
+        for(const key of keys) {
           if(key.startsWith("upd-")){
             const res = await Preferences.get({key: key});
             console.log("Result", res);

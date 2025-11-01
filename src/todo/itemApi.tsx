@@ -20,7 +20,7 @@ interface MessageData {
   event: string;
   payload: {
     successMessage: string,
-    items: ItemProps
+    items: ItemProps[]
   };
 }
 
