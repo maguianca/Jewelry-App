@@ -43,8 +43,6 @@ const UPDATE_ITEM_FAILED = 'UPDATE_ITEM_FAILED';
 const CREATE_ITEM_STARTED = 'CREATE_ITEM_STARTED';
 const CREATE_ITEM_SUCCEEDED = 'CREATE_ITEM_SUCCEEDED';
 const CREATE_ITEM_FAILED = 'CREATE_ITEM_FAILED';
-const SHOW_SUCCESS_MESSAGE = 'SHOW_SUCCESS_MESSAGE';
-const HIDE_SUCCESS_MESSAGE = 'HIDE_SUCCESS_MESSAGE';
 
 const reducer : (state: ItemsState, action: ActionProps)=> ItemsState = (state, {type,payload})=> {
   switch(type) {
@@ -83,10 +81,6 @@ const reducer : (state: ItemsState, action: ActionProps)=> ItemsState = (state, 
     case CREATE_ITEM_FAILED:
       console.log(payload.error);
       return { ...state, updateError: payload.error, updating: false };
-    case SHOW_SUCCESS_MESSAGE:
-      return { ...state, successMessage: payload.successMessage };
-    case HIDE_SUCCESS_MESSAGE:
-      return { ...state, successMessage: undefined };
     default:
       return state;
   }
@@ -112,7 +106,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
   const saveItem = useCallback<UpdateItemFn>(saveItemCallback, [token]);
   const updateItemFn = useCallback<UpdateItemFn>(updateItemCallback, [token]);
 
-  const value = { items, fetching, fetchingError, updating, updateError, saveItem, updateItem: updateItemFn, successMessage, closeShowSuccess };
+  const value = { items, fetching, fetchingError, updating, updateError, saveItem, updateItem: updateItemFn, successMessage };
 
   return (
       <ItemContext.Provider value={value}>
@@ -248,8 +242,4 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
     };
   }
 
-
-  function closeShowSuccess() {
-    dispatch({ type: HIDE_SUCCESS_MESSAGE });
-  }
 };
