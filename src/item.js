@@ -22,6 +22,7 @@ export class ItemStore {
     if (!item.categorie) {
       throw new Error('Missing category property')
     }
+    item.isNotSaved=false;
     return this.store.insert(item);
   };
 
@@ -66,7 +67,7 @@ const createItem = async (ctx, item, response) => {
     item.userId = userId;
     response.body = await itemStore.insert(item);
     response.status = 201; // created
-    broadcast(userId, { type: 'created', payload: item });
+    broadcast(userId, { event: 'created', payload: {items: response.body}});
   } catch (err) {
     response.body = { message: err.message };
     response.status = 400; // bad request
@@ -94,7 +95,7 @@ itemRouter.put('/:id', async ctx => {
     if (updatedCount === 1) {
       response.body = item;
       response.status = 200; // ok
-      broadcast(userId, { type: 'updated', payload: item });
+      broadcast(userId, { event: 'updated', payload:  { successMessage: "Updated game!", items: item } });
     } else {
       response.body = { message: 'Resource no longer exists' };
       response.status = 405; // method not allowed
@@ -110,5 +111,6 @@ itemRouter.del('/:id', async (ctx) => {
   } else {
     await itemStore.remove({ _id: ctx.params.id });
     ctx.response.status = 204; // no content
+    //trebuie adaugat broadcast message
   }
 });
