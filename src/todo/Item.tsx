@@ -6,8 +6,8 @@ import { ItemProps } from './ItemProps';
 interface ItemPropsExt extends ItemProps {
     onEdit: (id?: string) => void;
 }
-
-const Item: React.FC<ItemPropsExt> = ({ _id,cod,categorie, pret,pietre,data, onEdit }) => {
+const photoStyle = { width: '100%', margin: "0 0 0 0%" };
+const Item: React.FC<ItemPropsExt> = ({ _id,cod,categorie, pret,pietre,data,webViewPath, onEdit }) => {
     return (
         <IonItem onClick={() => onEdit(_id)} style={{
             minHeight: '150px',
@@ -17,6 +17,7 @@ const Item: React.FC<ItemPropsExt> = ({ _id,cod,categorie, pret,pietre,data, onE
             justifyContent: 'space-between',
             alignItems: 'center',
         }}>
+            <IonLabel>{webViewPath && (<img style={photoStyle} src={webViewPath} width={'200px'} height={'200px'}/>)}</IonLabel>
             <IonLabel>{cod}</IonLabel>
             <IonLabel>{categorie}</IonLabel>
             <IonLabel>{pret}</IonLabel>

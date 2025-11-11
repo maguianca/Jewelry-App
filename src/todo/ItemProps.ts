@@ -6,4 +6,5 @@ export interface ItemProps {
   pietre: boolean;
   data: Date;
   isNotSaved?:boolean;
+  webViewPath?: string;
 }

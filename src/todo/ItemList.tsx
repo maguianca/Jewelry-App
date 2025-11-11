@@ -156,7 +156,7 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
                 onIonChange={(e) => setStonesFilter(e.detail.value)}
                 interface="popover"
             >
-              <IonSelectOption value="indiferent">Indiferent</IonSelectOption>
+              <IonSelectOption value="indiferent">Alege</IonSelectOption>
               <IonSelectOption value="da">Da</IonSelectOption>
               <IonSelectOption value="nu">Nu</IonSelectOption>
             </IonSelect>
@@ -180,7 +180,7 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
 
           {displayed && (
               <IonList>
-                {displayed.map(({ _id, cod, categorie, pret, pietre, data }) => (
+                {displayed.map(({ _id, cod, categorie, pret, pietre, data,webViewPath }) => (
                     <Item
                         key={_id}
                         _id={_id}
@@ -189,6 +189,7 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
                         pret={pret}
                         pietre={pietre}
                         data={data}
+                        webViewPath={webViewPath}
                         onEdit={(id) => history.push(`/item/${id}`)}
                     />
                 ))}

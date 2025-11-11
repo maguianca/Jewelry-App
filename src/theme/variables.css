@@ -3,6 +3,9 @@ http://ionicframework.com/docs/theming/ */
 
 /** Ionic CSS Variables **/
 :root {
+  --ion-transition-duration: 90ms;
+  --ion-backdrop-opacity: 0.5;
+  --background: #f4f4f4;
   /** primary **/
   --ion-color-primary: #3880ff;
   --ion-color-primary-rgb: 56, 128, 255;
@@ -233,4 +236,9 @@ http://ionicframework.com/docs/theming/ */
 
     --ion-card-background: #1e1e1e;
   }
+}
+ion-action-sheet {
+  --ion-transition-duration: 90ms;
+  --ion-backdrop-opacity: 0.5;
+  --background: #f4f4f4;
 }

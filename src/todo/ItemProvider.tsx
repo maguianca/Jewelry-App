@@ -7,7 +7,7 @@ import { AuthContext } from '../auth';
 import { useNetwork } from '../pages/useNetwork';
 import { useIonToast } from "@ionic/react";
 import { Preferences } from '@capacitor/preferences';
-
+import { createAnimation } from "@ionic/react";
 const log = getLogger('ItemProvider');
 
 type UpdateItemFn = (item: ItemProps) => Promise<any>;
@@ -66,7 +66,7 @@ const reducer : (state: ItemsState, action: ActionProps)=> ItemsState = (state, 
       const beforeItems = [...(state.items || [])];
       const createdItem = payload.item;
       console.log(createdItem);
-      const indexOfAdded = beforeItems.findIndex(it => it._id === createdItem._id );
+      const indexOfAdded = beforeItems.findIndex(it => it._id === createdItem._id|| (it.cod === createdItem.cod && it.pret === createdItem.pret && it.categorie==createdItem.categorie) );
       console.log("index: ", indexOfAdded);
       if (indexOfAdded === -1) {
         beforeItems.splice(0, 0, createdItem);
@@ -81,6 +81,7 @@ const reducer : (state: ItemsState, action: ActionProps)=> ItemsState = (state, 
     case CREATE_ITEM_FAILED:
       console.log(payload.error);
       return { ...state, updateError: payload.error, updating: false };
+
     default:
       return state;
   }
@@ -241,5 +242,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
       closeWebSocket?.();
     };
   }
+
+
 
 };

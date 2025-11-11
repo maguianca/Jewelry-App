@@ -24,7 +24,9 @@ import './theme/variables.css';
 import { ItemEdit, ItemList, ItemAdd } from './todo';
 import { ItemProvider } from './todo/ItemProvider';
 import { AuthProvider, Login, PrivateRoute } from './auth';
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
 
+defineCustomElements(window);
 setupIonicReact();
 
 const App: React.FC = () => (
