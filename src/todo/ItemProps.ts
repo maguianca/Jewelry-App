@@ -7,4 +7,6 @@ export interface ItemProps {
   data: Date;
   isNotSaved?:boolean;
   webViewPath?: string;
+  latitude?:number;
+  longitude?:number;
 }
