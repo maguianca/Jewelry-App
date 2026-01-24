@@ -1,1 +1,1 @@
-export const mapsApiKey = 'x';
+export const mapsApiKey = 'AIzaSyDv0FBzvCZFduJFufflfGMhMVRXar2kFaM';

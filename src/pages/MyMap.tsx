@@ -87,7 +87,7 @@ export const MyMap: React.FC<MyMapProps> = ({
     return (
         <div className="component-wrapper">
             <IonButton style={{ padding: 3 }} onClick={createMap}>
-                View Map
+                SELECT LOCATION
             </IonButton>
             <capacitor-google-map
                 ref={mapRef}
